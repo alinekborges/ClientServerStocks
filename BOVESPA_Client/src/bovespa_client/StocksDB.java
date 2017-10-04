@@ -1,0 +1,16 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package bovespa_client;
+
+/**
+ *
+ * @author alinekborges
+ */
+public class StocksDB {
+    
+    public static String[] STOCKS = {"EMBR3"};
+    
+}
