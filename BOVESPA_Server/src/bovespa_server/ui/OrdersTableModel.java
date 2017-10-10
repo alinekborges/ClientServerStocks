@@ -5,7 +5,7 @@
  */
 package bovespa_server.ui;
 
-import bovespa_server.Order;
+import bovespa.Order;
 import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
 

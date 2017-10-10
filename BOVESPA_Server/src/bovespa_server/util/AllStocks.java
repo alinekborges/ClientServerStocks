@@ -5,7 +5,8 @@
  */
 package bovespa_server.util;
 
-import bovespa_server.Stock;
+import bovespa.InterfaceClient;
+import bovespa.Stock;
 import bovespa_server.util.StocksHistory;
 
 /**
@@ -34,6 +35,26 @@ public class AllStocks {
         //TODO: Find 4 random actions and go to next
         
         stocks[0].nextPrice();
+        
+    }
+    
+    public Stock stockWithName(String stockName) {
+        for (Stock stock : stocks) {
+            if (stock.name.equals(stockName)) {
+                return stock;
+            }
+        }
+        
+        return null;
+    }
+    
+    public void subscribe(String stockName, int clientID, InterfaceClient client) {
+        
+        Stock stock = stockWithName(stockName);
+        
+        if (stock != null) {
+            stock.addSubscriber(clientID, client);
+        }
         
     }
     

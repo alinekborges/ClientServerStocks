@@ -5,7 +5,8 @@
  */
 package bovespa_client.ui;
 
-import bovespa_client.Stock;
+import bovespa.Order;
+import bovespa.Stock;
 import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
 
@@ -34,7 +35,15 @@ public class MyStocksTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        return 1;
+        Stock stock = stocks.get(rowIndex);
+        switch (columnIndex) {
+            case 0:
+                return stock.name;
+            case 1:
+                return stock.price;
+            default:
+                return "";
+        }
     }
 
     @Override

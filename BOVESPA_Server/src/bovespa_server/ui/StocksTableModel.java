@@ -5,7 +5,7 @@
  */
 package bovespa_server.ui;
 
-import bovespa_server.Stock;
+import bovespa.Stock;
 import javax.swing.table.AbstractTableModel;
 
 /**
