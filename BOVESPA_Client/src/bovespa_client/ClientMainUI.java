@@ -5,27 +5,20 @@
  */
 package bovespa_client;
 
+import bovespa_client.ui.InterfaceClientUI;
 import util.StocksDB;
 import bovespa_client.ui.ListeningStocksTableModel;
 import bovespa_client.ui.OrdersTableModel;
 import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Random;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.JTableHeader;
 import javax.swing.table.TableModel;
 
 /**
  *
  * @author alinekborges
  */
-public class MainUI extends javax.swing.JFrame {
+public class ClientMainUI extends javax.swing.JFrame implements InterfaceClientUI {
     
-    private ArrayList<Stock> listeningStocks = new ArrayList<>();
-    private ArrayList<Stock> myStocks = new ArrayList<>();
-    private ArrayList<Order> orders = new ArrayList<>();
+    public Client client;
     
     public Color cyan;
     public Color orange;
@@ -39,9 +32,11 @@ public class MainUI extends javax.swing.JFrame {
     /**
      * Creates new form MainUI
      */
-    public MainUI() {
+    public ClientMainUI() {
         this.cyan = new java.awt.Color(80, 227, 194);
         this.orange = new java.awt.Color(252, 197, 47);
+        
+        this.client = new Client();
         
         initComponents();
         aditionalSetup();
@@ -51,20 +46,20 @@ public class MainUI extends javax.swing.JFrame {
       
         
       stocksTable.setFillsViewportHeight(true);
-      listeningStocksTableModel = new ListeningStocksTableModel(this.listeningStocks);
+      listeningStocksTableModel = new ListeningStocksTableModel(client.listeningStocks);
       stocksTable.setModel(listeningStocksTableModel);
       
       ordersTable.setFillsViewportHeight(true);
-      ordersTableModel = new OrdersTableModel(this.orders);
+      ordersTableModel = new OrdersTableModel(client.orders);
       ordersTable.setModel(ordersTableModel);
       
       myStocksTable.setFillsViewportHeight(true);
-      myStocksTableModel = new ListeningStocksTableModel(this.listeningStocks);
+      myStocksTableModel = new ListeningStocksTableModel(client.myStocks);
       myStocksTable.setModel(myStocksTableModel);
       
-      jComboBox1.removeAllItems();
+      subscribedStocksComboBox.removeAllItems();
       for(String str : StocksDB.STOCKS) {
-        jComboBox1.addItem(str);
+        subscribedStocksComboBox.addItem(str);
       }
       
       orderComboBox.removeAllItems();
@@ -72,12 +67,23 @@ public class MainUI extends javax.swing.JFrame {
         orderComboBox.addItem(str);
       }
       
-      Random rand = new Random();
+      titleLabel.setText(titleLabel.getText() + " - " + String.valueOf(client.ID));
       
-      int id = rand.nextInt(50) + 1;
-      
-      titleLabel.setText(titleLabel.getText() + " - " + String.valueOf(id));
-      
+    }
+    
+    @Override
+    public void updateMyStocks() {
+        this.myStocksTable.repaint();
+    }
+
+    @Override
+    public void updateOrders() {
+        this.ordersTable.repaint();
+    }
+
+    @Override
+    public void updateStocks() {
+        this.stocksTable.repaint();
     }
 
     /**
@@ -93,8 +99,8 @@ public class MainUI extends javax.swing.JFrame {
         titleLabel = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         stocksTable = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        subscribeStock = new javax.swing.JButton();
+        subscribedStocksComboBox = new javax.swing.JComboBox<>();
         jSeparator1 = new javax.swing.JSeparator();
         jScrollPane3 = new javax.swing.JScrollPane();
         ordersTable = new javax.swing.JTable();
@@ -130,16 +136,16 @@ public class MainUI extends javax.swing.JFrame {
         stocksTable.setGridColor(new java.awt.Color(51, 62, 72));
         jScrollPane2.setViewportView(stocksTable);
 
-        jButton1.setForeground(new java.awt.Color(255, 255, 255));
-        jButton1.setText("+");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        subscribeStock.setForeground(new java.awt.Color(255, 255, 255));
+        subscribeStock.setText("+");
+        subscribeStock.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                subscribeStockActionPerformed(evt);
             }
         });
 
-        jComboBox1.setForeground(new java.awt.Color(51, 51, 51));
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        subscribedStocksComboBox.setForeground(new java.awt.Color(51, 51, 51));
+        subscribedStocksComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         ordersTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -206,9 +212,9 @@ public class MainUI extends javax.swing.JFrame {
                     .addComponent(titleLabel)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addGroup(jPanel1Layout.createSequentialGroup()
-                            .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(subscribedStocksComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE))
+                            .addComponent(subscribeStock, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE))
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -237,8 +243,8 @@ public class MainUI extends javax.swing.JFrame {
                 .addGap(17, 17, 17)
                 .addComponent(titleLabel)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(subscribeStock)
+                    .addComponent(subscribedStocksComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(buyToggleButton)
                     .addComponent(sendOrderButton)
                     .addComponent(orderPrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -276,9 +282,9 @@ public class MainUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void subscribeStockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_subscribeStockActionPerformed
+        this.client.addListeningStock(String.valueOf(this.subscribedStocksComboBox.getSelectedItem()));
+    }//GEN-LAST:event_subscribeStockActionPerformed
 
     private void buyToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buyToggleButtonActionPerformed
         if (this.state == Order.Type.BUY) {
@@ -296,11 +302,8 @@ public class MainUI extends javax.swing.JFrame {
 
     private void sendOrderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendOrderButtonActionPerformed
         
-        //TODO: Actually send order
-        
         Order order = createOrder();
-        this.orders.add(order);
-        ordersTable.repaint();
+        this.client.addOrder(order);
         
     }//GEN-LAST:event_sendOrderButtonActionPerformed
 
@@ -342,28 +345,27 @@ public class MainUI extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(MainUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ClientMainUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(MainUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ClientMainUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(MainUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ClientMainUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MainUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ClientMainUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new MainUI().setVisible(true);
+                new ClientMainUI().setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton buyToggleButton;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
@@ -377,6 +379,10 @@ public class MainUI extends javax.swing.JFrame {
     private javax.swing.JTable ordersTable;
     private javax.swing.JButton sendOrderButton;
     private javax.swing.JTable stocksTable;
+    private javax.swing.JButton subscribeStock;
+    private javax.swing.JComboBox<String> subscribedStocksComboBox;
     private javax.swing.JLabel titleLabel;
     // End of variables declaration//GEN-END:variables
+
+    
 }
