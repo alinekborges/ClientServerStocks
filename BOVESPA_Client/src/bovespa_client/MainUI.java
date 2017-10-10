@@ -19,26 +19,23 @@ import javax.swing.table.TableModel;
  */
 public class MainUI extends javax.swing.JFrame {
     
-    private ArrayList<Stock> stocks = new ArrayList<>();
-
-    public Color backgroundColor;
+    private ArrayList<Stock> listeningStocks = new ArrayList<>();
+    
+    private ArrayList<Order> orders = new ArrayList<>();
+    
     public Color cyan;
     public Color orange;
     
-    private TableModel tableModel;
+    private TableModel stocksTableModel;
+    private TableModel ordersTableModel;
     
-    private State state = State.BUY;
-    
-    enum State {
-        BUY, SELL
-    }
+    private Order.Type state = Order.Type.BUY;
     
     /**
      * Creates new form MainUI
      */
     public MainUI() {
         this.cyan = new java.awt.Color(80, 227, 194);
-        this.backgroundColor = new java.awt.Color(51, 62, 72);
         this.orange = new java.awt.Color(252, 197, 47);
         
         initComponents();
@@ -49,24 +46,22 @@ public class MainUI extends javax.swing.JFrame {
       
         
       stocksTable.setFillsViewportHeight(true);
+      stocksTableModel = new StocksTableModel(this.listeningStocks);
+      stocksTable.setModel(stocksTableModel);
       
-      tableModel = new StocksTableModel(this.stocks);
-      stocksTable.setModel(tableModel);
-      
-      DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer();
-      headerRenderer.setBackground(backgroundColor);
-      headerRenderer.setForeground(Color.WHITE);
-
-      for (int i = 0; i < stocksTable.getModel().getColumnCount(); i++) {
-        stocksTable.getColumnModel().getColumn(i).setHeaderRenderer(headerRenderer);
-      }
+      ordersTable.setFillsViewportHeight(true);
+      ordersTableModel = new OrdersTableModel(this.orders);
+      ordersTable.setModel(ordersTableModel);
       
       jComboBox1.removeAllItems();
       for(String str : StocksDB.STOCKS) {
         jComboBox1.addItem(str);
       }
       
-      
+      orderComboBox.removeAllItems();
+      for(String str : StocksDB.STOCKS) {
+        orderComboBox.addItem(str);
+      }
       
     }
 
@@ -81,7 +76,6 @@ public class MainUI extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jPanel2 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         stocksTable = new javax.swing.JTable();
         jButton1 = new javax.swing.JButton();
@@ -91,31 +85,18 @@ public class MainUI extends javax.swing.JFrame {
         ordersTable = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
         buyToggleButton = new javax.swing.JToggleButton();
+        orderComboBox = new javax.swing.JComboBox<>();
+        orderPrice = new javax.swing.JTextField();
+        sendOrderButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(51, 62, 72));
 
-        jPanel1.setBackground(new java.awt.Color(51, 62, 72));
-
         jLabel1.setFont(new java.awt.Font("Helvetica Neue", 0, 24)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(80, 227, 194));
+        jLabel1.setForeground(new java.awt.Color(0, 102, 102));
         jLabel1.setText("stockBROKER");
 
-        jPanel2.setBackground(new java.awt.Color(80, 227, 194));
-        jPanel2.setForeground(new java.awt.Color(80, 227, 194));
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 8, Short.MAX_VALUE)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-
-        stocksTable.setBackground(new java.awt.Color(51, 62, 72));
+        stocksTable.setBackground(javax.swing.UIManager.getDefaults().getColor("window"));
         stocksTable.setFont(new java.awt.Font("Helvetica Neue", 0, 12)); // NOI18N
         stocksTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -131,7 +112,6 @@ public class MainUI extends javax.swing.JFrame {
         stocksTable.setGridColor(new java.awt.Color(51, 62, 72));
         jScrollPane2.setViewportView(stocksTable);
 
-        jButton1.setBackground(new java.awt.Color(80, 227, 194));
         jButton1.setForeground(new java.awt.Color(255, 255, 255));
         jButton1.setText("+");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -140,8 +120,7 @@ public class MainUI extends javax.swing.JFrame {
             }
         });
 
-        jComboBox1.setBackground(new java.awt.Color(79, 91, 101));
-        jComboBox1.setForeground(new java.awt.Color(255, 255, 255));
+        jComboBox1.setForeground(new java.awt.Color(51, 51, 51));
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         ordersTable.setModel(new javax.swing.table.DefaultTableModel(
@@ -158,15 +137,31 @@ public class MainUI extends javax.swing.JFrame {
         jScrollPane3.setViewportView(ordersTable);
 
         jLabel2.setFont(new java.awt.Font("Helvetica Neue", 0, 14)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(80, 227, 194));
+        jLabel2.setForeground(new java.awt.Color(0, 102, 102));
         jLabel2.setText("ORDERS");
 
         buyToggleButton.setBackground(new java.awt.Color(80, 227, 194));
         buyToggleButton.setText("BUY");
-        buyToggleButton.setDisabledIcon(new javax.swing.ImageIcon("/Users/alinekborges/Documents/2017/UTFPR/Sistemas Distribuídos/JavaRMI/Trabalho2_RMI/NewFolder/button_sell.png")); // NOI18N
         buyToggleButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buyToggleButtonActionPerformed(evt);
+            }
+        });
+
+        orderComboBox.setForeground(new java.awt.Color(51, 51, 51));
+        orderComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        orderPrice.setText("R$ 10,00");
+        orderPrice.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                orderPriceActionPerformed(evt);
+            }
+        });
+
+        sendOrderButton.setText("SEND");
+        sendOrderButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sendOrderButtonActionPerformed(evt);
             }
         });
 
@@ -177,48 +172,54 @@ public class MainUI extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(23, 23, 23)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel2)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 512, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 512, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 506, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 12, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE))
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
                         .addComponent(buyToggleButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(orderComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(orderPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(27, 27, 27)
+                        .addComponent(sendOrderButton))
+                    .addComponent(jSeparator1))
+                .addContainerGap(48, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(17, 17, 17)
                 .addComponent(jLabel1)
-                .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(152, 152, 152)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButton1)
-                            .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(buyToggleButton))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 407, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(208, 208, 208)
+                            .addComponent(orderPrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(orderComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(buyToggleButton)
+                            .addComponent(sendOrderButton))
+                        .addGap(27, 27, 27)
                         .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jButton1)
+                            .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 407, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -226,11 +227,13 @@ public class MainUI extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 18, Short.MAX_VALUE))
         );
 
         pack();
@@ -241,17 +244,39 @@ public class MainUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void buyToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buyToggleButtonActionPerformed
-        if (this.state == State.BUY) {
-            this.state = State.SELL;
+        if (this.state == Order.Type.BUY) {
+            this.state = Order.Type.SELL;
         } else {
-            this.state = State.BUY;
+            this.state = Order.Type.BUY;
         }
         
         updateState(this.state);
     }//GEN-LAST:event_buyToggleButtonActionPerformed
 
-    private void updateState(State state) {
-        if (this.state == State.BUY) {
+    private void orderPriceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_orderPriceActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_orderPriceActionPerformed
+
+    private void sendOrderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendOrderButtonActionPerformed
+        
+        //TODO: Actually send order
+        
+        Order order = createOrder();
+        this.orders.add(order);
+        ordersTable.repaint();
+        
+    }//GEN-LAST:event_sendOrderButtonActionPerformed
+
+    private Order createOrder() {
+        Order order = new Order();
+        order.type = this.state;
+        order.price = 10.0; //TODO
+        order.stock = String.valueOf(this.orderComboBox.getSelectedItem());
+        return order;
+    }
+    
+    private void updateState(Order.Type type) {
+        if (this.state == Order.Type.BUY) {
             this.buyToggleButton.setText("BUY");
             updateStateColor(cyan);
         } else {
@@ -305,11 +330,13 @@ public class MainUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JComboBox<String> orderComboBox;
+    private javax.swing.JTextField orderPrice;
     private javax.swing.JTable ordersTable;
+    private javax.swing.JButton sendOrderButton;
     private javax.swing.JTable stocksTable;
     // End of variables declaration//GEN-END:variables
 }
