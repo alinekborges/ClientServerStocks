@@ -5,6 +5,7 @@
  */
 package bovespa_client;
 
+import util.StocksDB;
 import bovespa_client.ui.ListeningStocksTableModel;
 import bovespa_client.ui.OrdersTableModel;
 import java.awt.Color;
@@ -75,7 +76,7 @@ public class MainUI extends javax.swing.JFrame {
       
       int id = rand.nextInt(50) + 1;
       
-      titleLabel.setText(titleLabel.getText() + String.valueOf(id));
+      titleLabel.setText(titleLabel.getText() + " - " + String.valueOf(id));
       
     }
 

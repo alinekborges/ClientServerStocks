@@ -5,9 +5,12 @@
  */
 package bovespa_server;
 
+import bovespa_server.ui.OrdersTableModel;
+import bovespa_server.util.AllStocks;
 import bovespa_server.ui.StocksTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import javax.swing.Timer;
 import javax.swing.table.TableModel;
 
@@ -15,41 +18,41 @@ import javax.swing.table.TableModel;
  *
  * @author alinekborges
  */
-public class MainUI extends javax.swing.JFrame {
+public class ServerMainUI extends javax.swing.JFrame implements IServerUI {
     
-    public AllStocks allstocks;
+    public Server server;
     
-    private TableModel tableModel;
+    private TableModel stocksTableModel;
+    private TableModel ordersTableModel;
 
     /**
      * Creates new form MainUI
      */
-    public MainUI() {
+    public ServerMainUI() {
         initComponents();
         setupComponents();
     }
     
     private void setupComponents() {
-        this.allstocks = new AllStocks();
+        this.server = new Server();
+        this.server.delegate = this;
         
-        this.tableModel = new StocksTableModel(allstocks.stocks);
+        this.stocksTableModel = new StocksTableModel(server.allstocks.stocks);
+        this.stocksTable.setModel(stocksTableModel);
         
-        this.stocksTable.setModel(tableModel);
+        this.ordersTableModel = new OrdersTableModel(server.orders);
+        this.ordersTable.setModel(ordersTableModel);
         
-        startTimer();
     }
     
-    private void startTimer() {
-        ActionListener action = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                allstocks.onNext();
-                stocksTable.repaint();
-            }
-        };
-     
-        Timer timer=new Timer(2500,action);//create the timer which calls the actionperformed method for every 1000 millisecond(1 second=1000 millisecond)
-        timer.start();//start the task
+    @Override
+    public void updateStocks() {
+        stocksTable.repaint();
+    }
+    
+    @Override
+    public void updateOrders() {
+        ordersTable.repaint();
     }
 
     /**
@@ -63,6 +66,9 @@ public class MainUI extends javax.swing.JFrame {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         stocksTable = new javax.swing.JTable();
+        jLabel1 = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        ordersTable = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -79,17 +85,46 @@ public class MainUI extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(stocksTable);
 
+        jLabel1.setFont(new java.awt.Font("Lucida Grande", 0, 18)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(0, 102, 102));
+        jLabel1.setText("SERVER");
+
+        ordersTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane2.setViewportView(ordersTable);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 432, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 22, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(197, 197, 197)
+                .addComponent(jLabel1)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 33, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 514, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(21, 21, 21)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 473, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2)))
         );
 
         pack();
@@ -112,26 +147,28 @@ public class MainUI extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(MainUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ServerMainUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(MainUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ServerMainUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(MainUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ServerMainUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MainUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ServerMainUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new MainUI().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new ServerMainUI().setVisible(true);
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTable ordersTable;
     private javax.swing.JTable stocksTable;
     // End of variables declaration//GEN-END:variables
 }

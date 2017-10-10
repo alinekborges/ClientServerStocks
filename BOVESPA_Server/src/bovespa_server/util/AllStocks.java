@@ -3,7 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package bovespa_server;
+package bovespa_server.util;
+
+import bovespa_server.Stock;
+import bovespa_server.util.StocksHistory;
 
 /**
  *
@@ -26,7 +29,7 @@ public class AllStocks {
         
     }
     
-    void onNext() {
+    public void onNext() {
         
         //TODO: Find 4 random actions and go to next
         
