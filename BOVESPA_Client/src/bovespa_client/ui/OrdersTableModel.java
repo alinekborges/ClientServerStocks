@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package bovespa_client;
+package bovespa_client.ui;
 
+import bovespa_client.Order;
 import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
 

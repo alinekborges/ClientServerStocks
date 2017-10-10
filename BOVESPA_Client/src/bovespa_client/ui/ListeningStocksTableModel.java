@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package bovespa_client;
+package bovespa_client.ui;
 
+import bovespa_client.Stock;
 import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
 
@@ -12,11 +13,11 @@ import javax.swing.table.AbstractTableModel;
  *
  * @author alinekborges
  */
-public class StocksTableModel extends AbstractTableModel {
+public class ListeningStocksTableModel extends AbstractTableModel {
     
     public ArrayList<Stock> stocks;
             
-    public StocksTableModel(ArrayList<Stock> stocks) {
+    public ListeningStocksTableModel(ArrayList<Stock> stocks) {
         this.stocks = stocks;
     }
 
