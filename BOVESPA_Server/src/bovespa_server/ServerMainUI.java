@@ -5,6 +5,7 @@
  */
 package bovespa_server;
 
+import bovespa_server.util.IServerUI;
 import bovespa_server.ui.OrdersTableModel;
 import bovespa_server.util.AllStocks;
 import bovespa_server.ui.StocksTableModel;
