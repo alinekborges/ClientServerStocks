@@ -7,7 +7,6 @@ package bovespa_server.util;
 
 import bovespa.InterfaceClient;
 import bovespa.Stock;
-import bovespa_server.util.StocksHistory;
 
 /**
  *
@@ -26,7 +25,20 @@ public class AllStocks {
         EMBR3.name = "EMBR3";
         EMBR3.setHistory(StocksHistory.historyFrom(EMBR3.name));
         
-        stocks = new Stock[]{EMBR3};
+        Stock PETR4 = new Stock();
+        PETR4.name = "PETR4";
+        PETR4.setHistory(StocksHistory.historyFrom(PETR4.name));
+        
+        Stock CSNA3 = new Stock();
+        CSNA3.name = "CSNA3";
+        CSNA3.setHistory(StocksHistory.historyFrom(CSNA3.name));
+        
+        Stock PTBL3 = new Stock();
+        PTBL3.name = "PTBL3";
+        PTBL3.setHistory(StocksHistory.historyFrom(PTBL3.name));
+        
+        stocks = new Stock[]{EMBR3, PETR4, CSNA3, PTBL3};
+        
         
     }
     
