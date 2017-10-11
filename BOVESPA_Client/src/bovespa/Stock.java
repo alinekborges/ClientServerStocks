@@ -13,5 +13,6 @@ public class Stock {
     
     public String name;
     public Double price;
+    public int quantity;
     
 }

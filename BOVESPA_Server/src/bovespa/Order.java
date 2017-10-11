@@ -5,6 +5,10 @@
  */
 package bovespa;
 
+import java.rmi.RemoteException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author alineborges
@@ -22,7 +26,26 @@ public class Order {
     public Type type;
     public String stock;
     public Double price;
+    public int quantity;
     public Status status = Status.PENDIND;
+    public int clientID;
+    public InterfaceClient client;
     
+    public void completeOrder()  {
+        
+        try {
+            if (type == Type.SELL) {
+                client.sellOrderCompleted(stock, quantity, price);
+            } else {
+                client.buyOrderCompleted(stock, quantity, price);
+            }
+            
+            this.status = Status.EXECUTED;
+            
+        } catch (RemoteException ex) {
+            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
     
 }

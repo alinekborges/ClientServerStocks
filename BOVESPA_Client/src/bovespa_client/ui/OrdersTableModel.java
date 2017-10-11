@@ -31,7 +31,8 @@ public class OrdersTableModel extends AbstractTableModel {
         if (col == 0) { return "TYPE"; }
         if (col == 1) { return "NAME"; }
         if (col == 2) { return "PRICE"; }
-        if (col == 3) { return "STATUS"; }
+        if (col == 3) { return "QUANTITY"; }
+        if (col == 4) { return "STATUS"; }
         
         return "";
     }
@@ -46,6 +47,8 @@ public class OrdersTableModel extends AbstractTableModel {
                 return order.stock;
             case 2:
                 return order.price;
+            case 3:
+                return order.quantity;
             case 3:
                 return order.status;
             default:

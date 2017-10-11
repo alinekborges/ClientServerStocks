@@ -22,6 +22,7 @@ public class Order {
     public Type type;
     public String stock;
     public Double price;
+    public int quantity;
     public Status status = Status.PENDIND;
     
 }

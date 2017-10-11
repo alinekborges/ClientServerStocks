@@ -39,9 +39,19 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
     }
     
     public void addOrder(Order order) {
-        //TODO: Actually send order
+        
         this.orders.add(order);
         this.delegate.updateOrders();
+        
+        try {
+            if (order.type == Order.Type.BUY) {
+                this.server.buyOrder(order.stock, order.quantity, order.price, ID, this);
+            } else {
+                this.server.sellOrder(order.stock, order.quantity, order.price, ID, this);
+            }
+        } catch (RemoteException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public void addListeningStock(String stockName) {
@@ -58,18 +68,6 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
         }
         
     }
-    
-    public Stock stockWithName(String stockName) {
-        
-        for (Stock stock : listeningStocks) {
-            if (stock.name.equals(stockName)) {
-                return stock;
-            }
-        }
-        
-        return null;
-    }
-
     //****************************************
     public void startRMI() {
         try {
@@ -83,7 +81,7 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
     
     @Override
     public void notify(String stockName, Double price) throws RemoteException {
-        Stock stock = stockWithName(stockName);
+        Stock stock = listeningStockWithName(stockName);
         
         System.out.println("Price for" + stockName + ": " + price);
         
@@ -93,7 +91,97 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
             delegate.updateStocks();
         }
     }
+
+    @Override
+    public void buyOrderCompleted(String stockName, int quantity, Double price) {
+        Order order = this.orderWithParams(Order.Type.BUY, stockName, quantity);
+        
+        if (order != null) {
+            order.status = Order.Status.EXECUTED;
+            this.executeOrder(order);
+            delegate.updateOrders();
+        }
+    }
+
+    @Override
+    public void sellOrderCompleted(String stockName, int quantity, Double price) {
+        Order order = this.orderWithParams(Order.Type.SELL, stockName, quantity);
+        
+        if (order != null) {
+            order.status = Order.Status.EXECUTED;
+            this.executeOrder(order);
+            delegate.updateOrders();
+        }
+    }
     
+    //******************************************
+    // Helper functions
+    public Stock createStock(String stockName, int quantity, Double price) {
+        Stock stock = new Stock();
+        stock.name = stockName;
+        stock.quantity = quantity;
+        stock.price = price;
+        myStocks.add(stock);
+        return stock;
+    }
+    
+    public Stock listeningStockWithName(String stockName) {
+        
+        for (Stock stock : listeningStocks) {
+            if (stock.name.equals(stockName)) {
+                return stock;
+            }
+        }
+        
+        return null;
+    }
+    
+    public Stock myStockWithName(String stockName) {
+        
+        for (Stock stock : myStocks) {
+            if (stock.name.equals(stockName)) {
+                return stock;
+            }
+        }
+        
+        return null;
+    }
+    
+    public Order orderWithParams(Order.Type type, String stockName, int quantity) {
+        for (Order order : orders) {
+            if (order.type == type
+                    && order.stock == stockName
+                    && order.quantity == quantity) {
+                return order;
+            }
+        }
+        
+        return null;
+    }
+    
+    public void executeOrder(Order order) {
+        
+        Stock stock = this.myStockWithName(order.stock);
+        
+        //The stock is already in my wallet, so updateValue
+        if (stock != null) {
+            
+            if (order.type == Order.Type.BUY) {
+                stock.quantity += order.quantity;
+                //TODO: Update PM
+            } else {
+                stock.quantity -= order.quantity;
+            }
+            
+        } else {
+            //The only way is buying a new stock
+            Stock newstock = this.createStock(order.stock, order.quantity, order.price);
+            this.myStocks.add(newstock);
+            
+        }
+        
+        delegate.updateMyStocks();
+    }
     
     
 }

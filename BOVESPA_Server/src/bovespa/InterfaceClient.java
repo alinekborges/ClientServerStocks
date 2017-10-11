@@ -15,6 +15,8 @@ import java.rmi.RemoteException;
 public interface InterfaceClient extends Remote {
     
     public void notify(String stockName, Double price) throws RemoteException;
+    public void buyOrderCompleted(String stockName, int quantity, Double price) throws RemoteException;
+    public void sellOrderCompleted(String stockName, int quantity, Double price) throws RemoteException;
     
 }
 

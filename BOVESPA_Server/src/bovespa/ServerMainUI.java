@@ -47,9 +47,11 @@ public class ServerMainUI extends javax.swing.JFrame implements IServerUI {
         
         this.server.delegate = this;
         
+        stocksTable.setFillsViewportHeight(true);
         this.stocksTableModel = new StocksTableModel(server.allstocks.stocks);
         this.stocksTable.setModel(stocksTableModel);
         
+        ordersTable.setFillsViewportHeight(true);
         this.ordersTableModel = new OrdersTableModel(server.orders);
         this.ordersTable.setModel(ordersTableModel);
         
@@ -62,6 +64,7 @@ public class ServerMainUI extends javax.swing.JFrame implements IServerUI {
     
     @Override
     public void updateOrders() {
+        System.out.println("reloading orders table");
         ordersTable.repaint();
     }
 
