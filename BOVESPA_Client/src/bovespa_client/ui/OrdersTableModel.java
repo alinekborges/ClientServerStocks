@@ -49,7 +49,7 @@ public class OrdersTableModel extends AbstractTableModel {
                 return order.price;
             case 3:
                 return order.quantity;
-            case 3:
+            case 4:
                 return order.status;
             default:
                 return "";
@@ -58,7 +58,7 @@ public class OrdersTableModel extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return 4;
+        return 5;
     }
 
 }

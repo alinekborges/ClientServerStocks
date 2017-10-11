@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -40,7 +42,22 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
     
     public void addOrder(Order order) {
         
-        this.orders.add(order);
+        //If you already is subscribed to this stock
+        //don't do it again!
+        Stock oldStock = this.myStockWithName(order.stock);
+        if (oldStock != null && oldStock.quantity < order.quantity) {
+            JOptionPane.showMessageDialog(new JFrame(), "Can't sell something you don' have!");
+            return;
+        }
+        
+        Order oldOrder = this.orderWithParams(order.type, order.stock);
+        //Oh! There is already an order with this stock, so just update it
+        if (oldOrder != null && oldOrder.price == order.price) {
+            oldOrder.quantity += order.quantity;
+        } else {
+            this.orders.add(order);
+        }
+       
         this.delegate.updateOrders();
         
         try {
@@ -55,7 +72,13 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
     }
     
     public void addListeningStock(String stockName) {
-        //TODO: Subscribe Stock 
+        
+        //If you already is subscribed to this stock
+        //don't do it again!
+        if (this.listeningStockWithName(stockName) != null) {
+            return;
+        }
+        
         Stock stock = new Stock();
         stock.name = stockName;
         this.listeningStocks.add(stock);
@@ -74,8 +97,11 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
             Registry refSN = LocateRegistry.getRegistry("localhost", 2021);
             server = (InterfaceServer) refSN.lookup("RefServidor");
             System.out.println("Client running");
+            
+
         } catch (RemoteException | NotBoundException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(new JFrame(), "Error connecting to server");
         }
     }
     
@@ -94,8 +120,7 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
 
     @Override
     public void buyOrderCompleted(String stockName, int quantity, Double price) {
-        Order order = this.orderWithParams(Order.Type.BUY, stockName, quantity);
-        
+        Order order = this.orderWithParams(Order.Type.BUY, stockName);
         if (order != null) {
             order.status = Order.Status.EXECUTED;
             this.executeOrder(order);
@@ -105,8 +130,7 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
 
     @Override
     public void sellOrderCompleted(String stockName, int quantity, Double price) {
-        Order order = this.orderWithParams(Order.Type.SELL, stockName, quantity);
-        
+        Order order = this.orderWithParams(Order.Type.SELL, stockName);
         if (order != null) {
             order.status = Order.Status.EXECUTED;
             this.executeOrder(order);
@@ -147,11 +171,11 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
         return null;
     }
     
-    public Order orderWithParams(Order.Type type, String stockName, int quantity) {
+    public Order orderWithParams(Order.Type type, String stockName) {
         for (Order order : orders) {
+            //TODO: Parcial order
             if (order.type == type
-                    && order.stock == stockName
-                    && order.quantity == quantity) {
+                    && order.stock.equals(stockName)) {
                 return order;
             }
         }
@@ -168,20 +192,24 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
             
             if (order.type == Order.Type.BUY) {
                 stock.quantity += order.quantity;
-                //TODO: Update PM
             } else {
                 stock.quantity -= order.quantity;
             }
+            
+            //Update PM
+            stock.price = stock.price + order.price / 2;
             
         } else {
             //The only way is buying a new stock
             Stock newstock = this.createStock(order.stock, order.quantity, order.price);
             this.myStocks.add(newstock);
+            System.out.println("executing order");
             
         }
         
         delegate.updateMyStocks();
     }
     
+ 
     
 }

@@ -31,7 +31,7 @@ public class Order {
     public int clientID;
     public InterfaceClient client;
     
-    public void completeOrder()  {
+    public void completeOrder(Double price)  {
         
         try {
             if (type == Type.SELL) {

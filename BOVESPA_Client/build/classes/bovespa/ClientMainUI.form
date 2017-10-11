@@ -82,7 +82,6 @@
                                   <Component id="orderPrice" min="-2" pref="100" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="sendOrderButton" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
                               </Group>
                               <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                           </Group>
@@ -92,7 +91,7 @@
                           <Component id="jScrollPane3" min="-2" pref="545" max="-2" attributes="0"/>
                       </Group>
                   </Group>
-                  <EmptySpace pref="37" max="32767" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -124,7 +123,7 @@
                           <Component id="jScrollPane3" min="-2" pref="198" max="-2" attributes="0"/>
                       </Group>
                   </Group>
-                  <EmptySpace pref="32" max="32767" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -263,7 +262,7 @@
         </Component>
         <Component class="javax.swing.JTextField" name="orderPrice">
           <Properties>
-            <Property name="text" type="java.lang.String" value="R$ 10,00"/>
+            <Property name="text" type="java.lang.String" value="10.00"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="orderPriceActionPerformed"/>

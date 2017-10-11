@@ -32,9 +32,9 @@ public class AllStocks {
     
     public void onNext() {
         
-        //TODO: Find 4 random actions and go to next
-        
-        stocks[0].nextPrice();
+        for (Stock stock : stocks) {
+            stock.nextPrice();
+        }
         
     }
     

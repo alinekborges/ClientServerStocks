@@ -38,11 +38,6 @@ public final class Server extends UnicastRemoteObject implements InterfaceServer
         
         startRMI();
         
-        Order order = new Order();
-        order.type = Order.Type.BUY;
-        order.status = Order.Status.EXECUTED;
-        this.orders.add(order);
-        
     }
     
     private void startTimer() {
@@ -76,9 +71,7 @@ public final class Server extends UnicastRemoteObject implements InterfaceServer
         Order order = this.createOrder(stockName, quantity, price, clientID, client);
         order.type = Order.Type.BUY;
         Stock stock = stockWithName(stockName);
-        System.out.println("BUY order arrived at server");
         if (stock != null) {
-            System.out.println("stock FOUND");
             stock.addOrder(order);
             orders.add(order);
             this.delegate.updateOrders();
@@ -90,7 +83,6 @@ public final class Server extends UnicastRemoteObject implements InterfaceServer
         Order order = this.createOrder(stockName, quantity, price, clientID, client);
         order.type = Order.Type.SELL;
         Stock stock = stockWithName(stockName);
-        System.out.println("SELL order arrived at server");
         if (stock != null) {
             stock.addOrder(order);
             orders.add(order);

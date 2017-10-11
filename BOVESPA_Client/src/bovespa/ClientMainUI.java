@@ -188,7 +188,7 @@ public class ClientMainUI extends javax.swing.JFrame implements InterfaceClientU
         orderComboBox.setForeground(new java.awt.Color(51, 51, 51));
         orderComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
-        orderPrice.setText("R$ 10,00");
+        orderPrice.setText("10.00");
         orderPrice.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 orderPriceActionPerformed(evt);
@@ -252,13 +252,12 @@ public class ClientMainUI extends javax.swing.JFrame implements InterfaceClientU
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(orderPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(sendOrderButton)
-                                .addGap(28, 28, 28))
+                                .addComponent(sendOrderButton))
                             .addComponent(jLabel2)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(18, 18, 18)
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 545, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(37, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -285,7 +284,7 @@ public class ClientMainUI extends javax.swing.JFrame implements InterfaceClientU
                         .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(32, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -332,9 +331,9 @@ public class ClientMainUI extends javax.swing.JFrame implements InterfaceClientU
     private Order createOrder() {
         Order order = new Order();
         order.type = this.state;
-        order.price = 10.0; //TODO
+        order.price = Double.parseDouble(this.orderPrice.getText());
         order.stock = String.valueOf(this.orderComboBox.getSelectedItem());
-        order.quantity = this.quantityComboBox.getSelectedIndex() * 100;
+        order.quantity = (this.quantityComboBox.getSelectedIndex() + 1) * 100;
         return order;
     }
     

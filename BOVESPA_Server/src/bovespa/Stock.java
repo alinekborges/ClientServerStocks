@@ -39,12 +39,12 @@ public class Stock {
     }
     
     public void nextPrice() {
-        if (currentPosition >= history.length) {
-            currentPosition = -1;
-        }
-        
         currentPosition++;
         
+        if (currentPosition >= history.length) {
+            currentPosition = 0;
+        }
+
         price = history[currentPosition];
         
         notifyClients();
@@ -65,8 +65,11 @@ public class Stock {
             Order matchOrder = this.verifyCanBuy(order);
             //TODO: Parcial orders
             if (matchOrder != null) {
-                order.completeOrder();
-                matchOrder.completeOrder();
+                //Efected at average of both prices
+                Double price = order.price + matchOrder.price / 2;
+                order.completeOrder(price);
+                matchOrder.completeOrder(price);
+                this.sellOrders.remove(matchOrder);
             } else {
                 this.buyOrders.add(order);
             }
@@ -77,8 +80,11 @@ public class Stock {
             Order matchOrder = this.verifyCanSell(order);
             //TODO: Parcial orders
             if (matchOrder != null) {
-                order.completeOrder();
-                matchOrder.completeOrder();
+                //Efected at average of both prices
+                Double price = order.price + matchOrder.price / 2;
+                order.completeOrder(price);
+                matchOrder.completeOrder(price);
+                this.buyOrders.remove(matchOrder);
             } else {
                 this.sellOrders.add(order);
             }

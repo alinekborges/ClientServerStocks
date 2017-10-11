@@ -28,10 +28,12 @@ public class OrdersTableModel extends AbstractTableModel {
 
     @Override
     public String getColumnName(int col) {
-        if (col == 0) { return "TYPE"; }
-        if (col == 1) { return "NAME"; }
-        if (col == 2) { return "PRICE"; }
-        if (col == 3) { return "STATUS"; }
+        if (col == 0) { return "CLIENT"; }
+        if (col == 1) { return "TYPE"; }
+        if (col == 2) { return "NAME"; }
+        if (col == 3) { return "PRICE"; }
+        if (col == 4) { return "QUANTITY"; }
+        if (col == 5) { return "STATUS"; }
         
         return "";
     }
@@ -41,12 +43,16 @@ public class OrdersTableModel extends AbstractTableModel {
         Order order = orders.get(rowIndex);
         switch (columnIndex) {
             case 0:
-                return order.type;
+                return order.clientID;
             case 1:
-                return order.stock;
+                return order.type;
             case 2:
-                return order.price;
+                return order.stock;
             case 3:
+                return order.price;
+            case 4:
+                return order.quantity;
+            case 5:
                 return order.status;
             default:
                 return "";
@@ -55,7 +61,7 @@ public class OrdersTableModel extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return 4;
+        return 6;
     }
 
 }
