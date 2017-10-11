@@ -145,7 +145,6 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
         stock.name = stockName;
         stock.quantity = quantity;
         stock.price = price;
-        myStocks.add(stock);
         return stock;
     }
     
@@ -197,13 +196,12 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
             }
             
             //Update PM
-            stock.price = stock.price + order.price / 2;
+            stock.price = (stock.price + order.price) / 2;
             
         } else {
             //The only way is buying a new stock
             Stock newstock = this.createStock(order.stock, order.quantity, order.price);
             this.myStocks.add(newstock);
-            System.out.println("executing order");
             
         }
         

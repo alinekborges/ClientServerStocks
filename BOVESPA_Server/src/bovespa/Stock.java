@@ -66,7 +66,7 @@ public class Stock {
             //TODO: Parcial orders
             if (matchOrder != null) {
                 //Efected at average of both prices
-                Double price = order.price + matchOrder.price / 2;
+                Double price = (order.price + matchOrder.price) / 2;
                 order.completeOrder(price);
                 matchOrder.completeOrder(price);
                 this.sellOrders.remove(matchOrder);
@@ -81,7 +81,7 @@ public class Stock {
             //TODO: Parcial orders
             if (matchOrder != null) {
                 //Efected at average of both prices
-                Double price = order.price + matchOrder.price / 2;
+                Double price = (order.price + matchOrder.price) / 2;
                 order.completeOrder(price);
                 matchOrder.completeOrder(price);
                 this.buyOrders.remove(matchOrder);
