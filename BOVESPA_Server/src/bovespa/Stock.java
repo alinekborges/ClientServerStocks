@@ -68,7 +68,7 @@ public class Stock {
             //TODO: Parcial orders
             if (matchOrder != null) {
                 //Efected at average of both prices
-                int quantity = abs(order.quantity - matchOrder.quantity);
+                int quantity = Math.min(matchOrder.quantity, order.quantity);
                 
                 Double endprice = (order.price + matchOrder.price) / 2;
                 order.completeOrder(endprice, quantity);
@@ -84,7 +84,7 @@ public class Stock {
             Order matchOrder = this.verifyCanSell(order);
             //There is an order that matches the one I have!!
             if (matchOrder != null) {
-                int quantity = abs(order.quantity - matchOrder.quantity);
+                int quantity = Math.min(matchOrder.quantity, order.quantity);
                 
                 //Efected at average of both prices
                 Double price = (order.price + matchOrder.price) / 2;

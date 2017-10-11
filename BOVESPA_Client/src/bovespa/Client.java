@@ -124,6 +124,7 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
     @Override
     public void buyOrderCompleted(String stockName, int quantity, Double price) {
         Order order = this.orderWithParams(Order.Type.BUY, stockName);
+        System.out.println("BUY ORDER QUANTITY: " + quantity + " PRICE " + price);
         if (order != null) {
             this.executeOrder(order, quantity, price);
             delegate.updateOrders();
@@ -133,6 +134,7 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
     @Override
     public void sellOrderCompleted(String stockName, int quantity, Double price) {
         Order order = this.orderWithParams(Order.Type.SELL, stockName);
+        System.out.println("BUY ORDER QUANTITY: " + quantity + " PRICE " + price);
         if (order != null) {
             this.executeOrder(order, quantity, price);
             delegate.updateOrders();
@@ -193,22 +195,10 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
         
         Stock stock = this.myStockWithName(order.stock);
         
-        //The stock is already in my wallet, so updateValue
-        if (stock != null) {
-            
-            if (order.type == Order.Type.BUY) {
-                stock.quantity += quantity;
-            } else {
-                stock.quantity -= quantity;
-            }
-            //Update PM
-            stock.price = price;
-            
-        } else {
-            //The only way is buying a new stock
-            Stock newstock = this.createStock(order.stock, order.quantity, order.price);
+        //The only way is buying a new stock
+        if (order.type == Order.Type.BUY) {
+            Stock newstock = this.createStock(order.stock, quantity, price);
             this.myStocks.add(newstock);
-            
         }
         
         
