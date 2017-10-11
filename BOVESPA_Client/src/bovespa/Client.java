@@ -45,9 +45,12 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
         //If you already is subscribed to this stock
         //don't do it again!
         Stock oldStock = this.myStockWithName(order.stock);
-        if (oldStock != null && oldStock.quantity < order.quantity) {
+        if (oldStock == null && order.type == Order.Type.SELL) {
             JOptionPane.showMessageDialog(new JFrame(), "Can't sell something you don' have!");
-            return;
+                return;
+        } else if (oldStock != null && order.type == Order.Type.SELL && oldStock.quantity < order.quantity) {
+            JOptionPane.showMessageDialog(new JFrame(), "Can't sell something you don' have!");
+                return; 
         }
         
         Order oldOrder = this.orderWithParams(order.type, order.stock);
