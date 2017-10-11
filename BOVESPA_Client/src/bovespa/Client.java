@@ -44,7 +44,7 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
         
         //If you already is subscribed to this stock
         //don't do it again!
-        Stock oldStock = this.myStockWithName(order.stock);
+        /*Stock oldStock = this.myStockWithName(order.stock);
         if (oldStock == null && order.type == Order.Type.SELL) {
             JOptionPane.showMessageDialog(new JFrame(), "Can't sell something you don't have!");
                 return;
@@ -52,7 +52,7 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
             JOptionPane.showMessageDialog(new JFrame(), "Can't sell something you don't have!");
                 return; 
         }
-        
+        */
         Order oldOrder = this.orderWithParams(order.type, order.stock);
         //Oh! There is already an order with this stock, so just update it
         if (oldOrder != null && oldOrder.price == order.price) {
@@ -125,8 +125,7 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
     public void buyOrderCompleted(String stockName, int quantity, Double price) {
         Order order = this.orderWithParams(Order.Type.BUY, stockName);
         if (order != null) {
-            order.status = Order.Status.EXECUTED;
-            this.executeOrder(order);
+            this.executeOrder(order, quantity, price);
             delegate.updateOrders();
         }
     }
@@ -135,8 +134,7 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
     public void sellOrderCompleted(String stockName, int quantity, Double price) {
         Order order = this.orderWithParams(Order.Type.SELL, stockName);
         if (order != null) {
-            order.status = Order.Status.EXECUTED;
-            this.executeOrder(order);
+            this.executeOrder(order, quantity, price);
             delegate.updateOrders();
         }
     }
@@ -185,7 +183,13 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
         return null;
     }
     
-    public void executeOrder(Order order) {
+    public void executeOrder(Order order, int quantity, Double price) {
+        
+        if (order.quantity == quantity) {
+                order.status = Order.Status.EXECUTED;
+        } else {
+                order.quantity -= quantity;
+        }
         
         Stock stock = this.myStockWithName(order.stock);
         
@@ -193,13 +197,12 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
         if (stock != null) {
             
             if (order.type == Order.Type.BUY) {
-                stock.quantity += order.quantity;
+                stock.quantity += quantity;
             } else {
-                stock.quantity -= order.quantity;
+                stock.quantity -= quantity;
             }
-            
             //Update PM
-            stock.price = (stock.price + order.price) / 2;
+            stock.price = price;
             
         } else {
             //The only way is buying a new stock
@@ -207,6 +210,8 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
             this.myStocks.add(newstock);
             
         }
+        
+        
         
         delegate.updateMyStocks();
     }

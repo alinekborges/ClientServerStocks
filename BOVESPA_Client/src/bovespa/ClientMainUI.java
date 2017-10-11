@@ -8,6 +8,7 @@ package bovespa;
 import bovespa_client.ui.InterfaceClientUI;
 import util.StocksDB;
 import bovespa_client.ui.ListeningStocksTableModel;
+import bovespa_client.ui.MyStocksTableModel;
 import bovespa_client.ui.OrdersTableModel;
 import java.awt.Color;
 import java.rmi.RemoteException;
@@ -62,7 +63,7 @@ public class ClientMainUI extends javax.swing.JFrame implements InterfaceClientU
       ordersTable.setModel(ordersTableModel);
       
       myStocksTable.setFillsViewportHeight(true);
-      myStocksTableModel = new ListeningStocksTableModel(client.myStocks);
+      myStocksTableModel = new MyStocksTableModel(client.myStocks);
       myStocksTable.setModel(myStocksTableModel);
       
       subscribedStocksComboBox.removeAllItems();
@@ -265,7 +266,7 @@ public class ClientMainUI extends javax.swing.JFrame implements InterfaceClientU
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(sendOrderButton))
                                     .addComponent(jLabel2))))))
-                .addContainerGap(216, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -299,9 +300,7 @@ public class ClientMainUI extends javax.swing.JFrame implements InterfaceClientU
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

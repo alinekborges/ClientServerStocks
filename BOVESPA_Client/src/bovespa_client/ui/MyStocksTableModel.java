@@ -30,7 +30,10 @@ public class MyStocksTableModel extends AbstractTableModel {
     @Override
     public String getColumnName(int col) {
         if (col == 0) { return "STOCK"; }
-        else { return "PRICE"; }
+        if (col == 1) { return "PRICE"; }
+        if (col == 2) { return "QUANTITY"; }
+        
+        return "";
     }
 
     @Override
@@ -41,6 +44,8 @@ public class MyStocksTableModel extends AbstractTableModel {
                 return stock.name;
             case 1:
                 return stock.price;
+            case 2:
+                return stock.quantity;
             default:
                 return "";
         }
@@ -48,7 +53,7 @@ public class MyStocksTableModel extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return 2;
+        return 3;
     }
 
 }

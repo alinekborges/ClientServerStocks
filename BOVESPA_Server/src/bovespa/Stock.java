@@ -5,6 +5,7 @@
  */
 package bovespa;
 
+import static java.lang.Math.abs;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,33 +64,60 @@ public class Stock {
         if (order.type == Order.Type.BUY) {
             
             Order matchOrder = this.verifyCanBuy(order);
+            
             //TODO: Parcial orders
             if (matchOrder != null) {
                 //Efected at average of both prices
-                Double price = (order.price + matchOrder.price) / 2;
-                order.completeOrder(price);
-                matchOrder.completeOrder(price);
+                int quantity = abs(order.quantity - matchOrder.quantity);
+                
+                Double endprice = (order.price + matchOrder.price) / 2;
+                order.completeOrder(endprice, quantity);
+                matchOrder.completeOrder(endprice, quantity);
                 this.sellOrders.remove(matchOrder);
             } else {
-                this.buyOrders.add(order);
+                addNewBuyOrder(order);
             }
         }
         
         if (order.type == Order.Type.SELL) {
             
             Order matchOrder = this.verifyCanSell(order);
-            //TODO: Parcial orders
+            //There is an order that matches the one I have!!
             if (matchOrder != null) {
+                int quantity = abs(order.quantity - matchOrder.quantity);
+                
                 //Efected at average of both prices
                 Double price = (order.price + matchOrder.price) / 2;
-                order.completeOrder(price);
-                matchOrder.completeOrder(price);
+                order.completeOrder(price, quantity);
+                matchOrder.completeOrder(price, quantity);
                 this.buyOrders.remove(matchOrder);
             } else {
-                this.sellOrders.add(order);
+                addNewSellOrder(order);
             }
         }
         
+    }
+    
+    public void addNewBuyOrder(Order neworder) {
+        for (Order order : buyOrders) {
+            if (order.clientID == neworder.clientID && order.stock == neworder.stock && order.price == neworder.price) {
+                order.quantity += neworder.quantity;
+                return;
+            }
+        }
+        
+        buyOrders.add(neworder);
+    }
+    
+    public void addNewSellOrder(Order neworder) {
+        for (Order order : sellOrders) {
+            if (order.clientID == neworder.clientID && order.stock == neworder.stock && order.price == neworder.price) {
+                order.quantity += neworder.quantity;
+                return;
+            }
+        }
+        
+        sellOrders.add(neworder);
     }
     
     public Order verifyCanBuy(Order newOrder) { 
@@ -97,9 +125,9 @@ public class Stock {
         Double buyPrice = newOrder.price;
         
         for (Order order : sellOrders) {
-            //TODO: Parcial orders
-            if (order.price <= buyPrice && order.quantity == newOrder.quantity) {
-                //Sell price lower than buy price
+            //Sell price lower than buy price
+            //and want I want to buy is lower than order quantity
+            if (order.price <= buyPrice) {
                 return order;
             }
         }
@@ -112,9 +140,9 @@ public class Stock {
         Double sellPrice = newOrder.price;
         
         for (Order order : buyOrders) {
-            //TODO: Parcial orders
-            if (order.price > sellPrice && order.quantity == newOrder.quantity) {
-                //Sell price lower than buy price
+            //Sell price lower than buy price
+            //and want I want to sell less than someone wants to buy
+            if (order.price > sellPrice) {
                 return order;
             }
         }
