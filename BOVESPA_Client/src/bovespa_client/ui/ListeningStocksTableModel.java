@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
 
 /**
- *
+ * Table model to fill UI of subscribed stocks
  * @author alinekborges
  */
 public class ListeningStocksTableModel extends AbstractTableModel {

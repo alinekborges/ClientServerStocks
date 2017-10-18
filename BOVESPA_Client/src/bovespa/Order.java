@@ -19,10 +19,10 @@ public class Order {
         PENDIND, EXECUTED
     }
     
-    public Type type;
-    public String stock;
-    public Double price;
-    public int quantity;
-    public Status status = Status.PENDIND;
+    public Type type; //Order type, if its by or sell
+    public String stock; //Stock name, like "EMBR3"
+    public Double price; //Stock price
+    public int quantity; //Quantity of this stock
+    public Status status = Status.PENDIND; //Stock status, pending or executed
     
 }

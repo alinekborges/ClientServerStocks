@@ -9,7 +9,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 /**
- *
+ * 
  * @author alineborges
  */
 public interface InterfaceClient extends Remote {

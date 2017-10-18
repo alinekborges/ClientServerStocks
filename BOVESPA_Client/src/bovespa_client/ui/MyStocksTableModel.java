@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
 
 /**
- *
+ * Table model to fill UI of my stocks
  * @author alineborges
  */
 public class MyStocksTableModel extends AbstractTableModel {

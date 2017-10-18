@@ -6,11 +6,12 @@
 package util;
 
 /**
- *
+ * Just holds all stocks ame
  * @author alinekborges
  */
 public class StocksDB {
     
-    public static String[] STOCKS = {"EMBR3", "PETR4", "CSNA3", "PTBL3"};
+    public static String[] STOCKS = {"EMBR3", "PETR4", "CSNA3", "PTBL3", "ITSA4", "NATU3" };
+
     
 }

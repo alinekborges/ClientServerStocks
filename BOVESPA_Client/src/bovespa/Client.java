@@ -26,33 +26,32 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
     
     public int ID;
     
+    //connection to call server methods
     public InterfaceServer server;
     
     public ArrayList<Stock> listeningStocks = new ArrayList<>();
     public ArrayList<Stock> myStocks = new ArrayList<>();
     public ArrayList<Order> orders = new ArrayList<>();
     
+    //To separate UI logic from Client logic
     public InterfaceClientUI delegate;
     
+    /**
+     * Construct Client object with random ID and starts RMI
+     * @throws RemoteException 
+     */
     public Client() throws RemoteException {
         Random rand = new Random();
         this.ID = rand.nextInt(1000) + 1;
         startRMI();
     }
     
+    /**
+     * Add a new order and send it to the server
+     * @param order 
+     */
     public void addOrder(Order order) {
         
-        //If you already is subscribed to this stock
-        //don't do it again!
-        /*Stock oldStock = this.myStockWithName(order.stock);
-        if (oldStock == null && order.type == Order.Type.SELL) {
-            JOptionPane.showMessageDialog(new JFrame(), "Can't sell something you don't have!");
-                return;
-        } else if (oldStock != null && order.type == Order.Type.SELL && oldStock.quantity < order.quantity) {
-            JOptionPane.showMessageDialog(new JFrame(), "Can't sell something you don't have!");
-                return; 
-        }
-        */
         Order oldOrder = this.orderWithParams(order.type, order.stock);
         //Oh! There is already an order with this stock, so just update it
         if (oldOrder != null && oldOrder.price == order.price) {
@@ -63,6 +62,7 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
        
         this.delegate.updateOrders();
         
+        //Sends buy or send order to the server
         try {
             if (order.type == Order.Type.BUY) {
                 this.server.buyOrder(order.stock, order.quantity, order.price, ID, this);
@@ -74,6 +74,10 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
         }
     }
     
+    /**
+     * Subscribes to server to get updates for a certain stock
+     * @param stockName 
+     */
     public void addListeningStock(String stockName) {
         
         //If you already is subscribed to this stock
@@ -85,16 +89,22 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
         Stock stock = new Stock();
         stock.name = stockName;
         this.listeningStocks.add(stock);
-        this.delegate.updateStocks();
+        
         
         try {
             this.server.subscribe(stockName, ID, this);
+            stock.price = this.server.getPrice(stockName);
         } catch (RemoteException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
         
+        this.delegate.updateStocks();
+        
     }
     //****************************************
+    /**
+     * Starts RMI conection
+     */
     public void startRMI() {
         try {
             Registry refSN = LocateRegistry.getRegistry("localhost", 2021);
@@ -108,11 +118,16 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
         }
     }
     
+    /**
+     * Remote method
+     * Gets notification of price change from server
+     * @param stockName
+     * @param price
+     * @throws RemoteException 
+     */
     @Override
     public void notify(String stockName, Double price) throws RemoteException {
         Stock stock = listeningStockWithName(stockName);
-        
-        System.out.println("Price for" + stockName + ": " + price);
         
         if (stock != null) {
             
@@ -121,6 +136,13 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
         }
     }
 
+    /**
+     * Remote method
+     * Received when the buy order is executed
+     * @param stockName
+     * @param quantity
+     * @param price 
+     */
     @Override
     public void buyOrderCompleted(String stockName, int quantity, Double price) {
         Order order = this.orderWithParams(Order.Type.BUY, stockName);
@@ -131,6 +153,13 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
         }
     }
 
+    /**
+     * Remote method
+     * Received when my sell order is executed
+     * @param stockName
+     * @param quantity
+     * @param price 
+     */
     @Override
     public void sellOrderCompleted(String stockName, int quantity, Double price) {
         Order order = this.orderWithParams(Order.Type.SELL, stockName);
@@ -143,7 +172,14 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
     
     //******************************************
     // Helper functions
-    public Stock createStock(String stockName, int quantity, Double price) {
+    /**
+     * Creates stocks based on name, quantity and price
+     * @param stockName
+     * @param quantity
+     * @param price
+     * @return 
+     */
+    private Stock createStock(String stockName, int quantity, Double price) {
         Stock stock = new Stock();
         stock.name = stockName;
         stock.quantity = quantity;
@@ -151,6 +187,11 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
         return stock;
     }
     
+    /**
+     * Runs the list and find the stock being observed with that name
+     * @param stockName
+     * @return 
+     */
     public Stock listeningStockWithName(String stockName) {
         
         for (Stock stock : listeningStocks) {
@@ -162,6 +203,11 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
         return null;
     }
     
+    /**
+     * Finds the stock reference with given name
+     * @param stockName
+     * @return 
+     */
     public Stock myStockWithName(String stockName) {
         
         for (Stock stock : myStocks) {
@@ -173,6 +219,12 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
         return null;
     }
     
+    /**
+     * Find order reference with stock name
+     * @param type
+     * @param stockName
+     * @return 
+     */
     public Order orderWithParams(Order.Type type, String stockName) {
         for (Order order : orders) {
             //TODO: Parcial order
@@ -185,6 +237,12 @@ public final class Client extends UnicastRemoteObject implements InterfaceClient
         return null;
     }
     
+    /**
+     * When some order is received, it needs to be executed in client
+     * @param order
+     * @param quantity
+     * @param price 
+     */
     public void executeOrder(Order order, int quantity, Double price) {
         
         if (order.quantity == quantity) {

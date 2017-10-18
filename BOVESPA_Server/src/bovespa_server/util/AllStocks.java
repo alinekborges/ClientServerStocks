@@ -37,11 +37,22 @@ public class AllStocks {
         PTBL3.name = "PTBL3";
         PTBL3.setHistory(StocksHistory.historyFrom(PTBL3.name));
         
-        stocks = new Stock[]{EMBR3, PETR4, CSNA3, PTBL3};
+        Stock ITSA4 = new Stock();
+        ITSA4.name = "ITSA4";
+        ITSA4.setHistory(StocksHistory.historyFrom(ITSA4.name));
+        
+        Stock NATU3 = new Stock();
+        NATU3.name = "NATU3";
+        NATU3.setHistory(StocksHistory.historyFrom(NATU3.name));
+        
+        stocks = new Stock[]{EMBR3, PETR4, CSNA3, PTBL3, ITSA4, NATU3};
         
         
     }
     
+    /**
+     * Iterate all stocks and go to next price (this will be called repeteadely with timer)
+     */
     public void onNext() {
         
         for (Stock stock : stocks) {
@@ -50,6 +61,11 @@ public class AllStocks {
         
     }
     
+    /**
+     * Returns stock reference with given name
+     * @param stockName
+     * @return 
+     */
     public Stock stockWithName(String stockName) {
         for (Stock stock : stocks) {
             if (stock.name.equals(stockName)) {
@@ -60,6 +76,12 @@ public class AllStocks {
         return null;
     }
     
+    /**
+     * Receives a new subscription request and adds it to the stock
+     * @param stockName
+     * @param clientID
+     * @param client 
+     */
     public void subscribe(String stockName, int clientID, InterfaceClient client) {
         
         Stock stock = stockWithName(stockName);

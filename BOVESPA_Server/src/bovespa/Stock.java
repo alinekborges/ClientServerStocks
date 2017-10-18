@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 public class Stock {
 
     public Map<String, InterfaceClient> subscribedClients;
+    //keeps an array of buy orders and sell orders
     public ArrayList<Order> buyOrders = new ArrayList<>();
     public ArrayList<Order> sellOrders = new ArrayList<>();
 
@@ -31,14 +32,17 @@ public class Stock {
     
     public Stock() {
         this.subscribedClients = new HashMap<>();
-        
     }
+    
     
     public void setHistory(Double[] history) {
         this.history = history;
         this.price = history[0];
     }
     
+    /**
+     * Goes to next price in list, to update stock price and notify clients subscribed to this stock
+     */
     public void nextPrice() {
         currentPosition++;
         
@@ -51,6 +55,11 @@ public class Stock {
         notifyClients();
     }
     
+    /**
+     * Adds a client subscriber to this stock that wants to receive prices updates
+     * @param ID
+     * @param client 
+     */
     public void addSubscriber(int ID, InterfaceClient client) {
         String stringID = String.valueOf(ID);
         
@@ -59,6 +68,12 @@ public class Stock {
         }
     }
     
+    /**
+     * Add a new order related to this stock
+     * All other orders will be verified to check if this order can be executed or will just go to the list
+     * If order can be executed, it will be partially or completely executed and call client with the order status, price and quantity sold/bought
+     * @param order 
+     */
     public void addOrder(Order order) {
         
         if (order.type == Order.Type.BUY) {
@@ -73,7 +88,10 @@ public class Stock {
                 Double endprice = (order.price + matchOrder.price) / 2;
                 order.completeOrder(endprice, quantity);
                 matchOrder.completeOrder(endprice, quantity);
-                this.sellOrders.remove(matchOrder);
+                
+                if (order.quantity == matchOrder.quantity) {
+                    this.sellOrders.remove(matchOrder);
+                }
             } else {
                 addNewBuyOrder(order);
             }
@@ -90,7 +108,9 @@ public class Stock {
                 Double price = (order.price + matchOrder.price) / 2;
                 order.completeOrder(price, quantity);
                 matchOrder.completeOrder(price, quantity);
-                this.buyOrders.remove(matchOrder);
+                if (order.quantity == matchOrder.quantity) {
+                    this.sellOrders.remove(matchOrder);
+                }
             } else {
                 addNewSellOrder(order);
             }
@@ -98,6 +118,10 @@ public class Stock {
         
     }
     
+    /**
+     * Add new Buy order to array (if it is from the same client and same price, just update quantity of curernt order)
+     * @param neworder 
+     */
     public void addNewBuyOrder(Order neworder) {
         for (Order order : buyOrders) {
             if (order.clientID == neworder.clientID && order.stock == neworder.stock && order.price == neworder.price) {
@@ -109,6 +133,10 @@ public class Stock {
         buyOrders.add(neworder);
     }
     
+    /**
+     * Add new SELL order to array (if it is from the same client and same price, just update quantity of curernt order)
+     * @param neworder 
+     */
     public void addNewSellOrder(Order neworder) {
         for (Order order : sellOrders) {
             if (order.clientID == neworder.clientID && order.stock == neworder.stock && order.price == neworder.price) {
@@ -120,6 +148,11 @@ public class Stock {
         sellOrders.add(neworder);
     }
     
+    /**
+     * Verify if BUY order has a corresponding sell order that can be combined together
+     * @param newOrder
+     * @return 
+     */
     public Order verifyCanBuy(Order newOrder) { 
         
         Double buyPrice = newOrder.price;
@@ -135,6 +168,11 @@ public class Stock {
         return null;
     }
     
+    /**
+     * * Verify if SELL order has a corresponding sell order that can be combined together
+     * @param newOrder
+     * @return 
+     */
     public Order verifyCanSell(Order newOrder) {
         
         Double sellPrice = newOrder.price;
@@ -150,6 +188,9 @@ public class Stock {
         return null;
     }
     
+    /**
+     * Notify all subscribed clients of a price update
+     */
     public void notifyClients() {
         
         subscribedClients.forEach((ID, client) ->  {

@@ -17,4 +17,6 @@ public interface InterfaceServer extends Remote {
     public void subscribe(String stockName, int clientID, InterfaceClient client) throws RemoteException;
     public void buyOrder(String stockName, int quantity, Double price, int clientID, InterfaceClient client) throws RemoteException;
     public void sellOrder(String stockName, int quantity, Double price, int clientID, InterfaceClient client) throws RemoteException;
+    public Double getPrice(String stockName) throws RemoteException;
+    
 }

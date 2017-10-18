@@ -32,6 +32,13 @@ public class Order {
     public int clientID;
     public InterfaceClient client;
     
+    /**
+     * Complete order with price and quantity that matches other order
+     * If the quantity of the order matches this order, it is fully executed
+     * Else, it is just parcially executed and keeps new quantity
+     * @param price
+     * @param quantity 
+     */
     public void completeOrder(Double price, int quantity)  {
         
         try {
